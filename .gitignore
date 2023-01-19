@@ -1,0 +1,9 @@
+chn-database
+chn-frontend
+gisdb
+graphdb
+*.code-workspace
+*.env
+Create.cypher
+*:Zone.Identifier
+*.gpkg

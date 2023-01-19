@@ -1,0 +1,66 @@
+version: "3.9"
+services:
+  frontend:
+    build: ./chn-frontend
+    # volumes:
+    #   - ./test:/usr/src
+    #   - ./test/node_modules:/home/node/app/node_modules
+    env_file:
+      - frontend.env
+    ports:
+      - 8080:8080
+    networks:
+      - external
+  backend:
+    build: ./chn-database/Backend
+    ports:
+      - 8003:8003
+      # - 9229:9229
+    env_file:
+      - backend.env
+    networks:
+      - external
+      - internalonly
+  graphdb:
+    image: neo4j:5.3.0-community
+    ports:
+      - 7474
+      - 7687
+    env_file:
+      - graphdb.env
+    volumes:
+      - ./graphdb/data:/data
+      - ./graphdb/import:/import
+      - ./graphdb/logs:/logs
+    networks:
+      - internalonly
+  gisdb:
+    image: postgis/postgis:15-3.3
+    ports:
+      - 5432
+    env_file:
+      - gisdb.env
+    volumes:
+      - ./gisdb:/var/lib/postgresql
+      - ./gisdb/data:/var/lib/postgresql/data
+    networks:
+      - internalonly
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    env_file:
+      - pgadmin.env
+    ports:
+      - 8007:80
+    volumes:
+      - ./gisdb/pgadmin:/var/lib/pgadmin
+      - ./gisdb/servers.json:/pgadmin4/servers.json
+    networks:
+      - external      #allows 
+      - internalonly  #only available to this docker, we don't even have access
+networks:
+  external:
+    driver: bridge
+  internalonly:
+    driver: bridge
+volumes:
+  node_modules:
